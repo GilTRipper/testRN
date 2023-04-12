@@ -1,118 +1,78 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+import React from "react";
+import { StatusBar } from "react-native";
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { AppProvider, createApp } from "./src/lib/core";
+import { RootNavigator } from "./src/UI/navigation/RootNavigator";
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+const data = {
+  "archery-mission-lvl": {
+    fails: 9,
+    gameId: "archery-world-tour",
+    playTime: 5291.706,
+    wins: 8,
+  },
+  "archery-world-mission-1": {
+    fails: 9,
+    gameId: "archery-world-tour",
+    playTime: 981,
+    wins: 6,
+  },
+  "bubble-woods-mission-1": {
+    fails: 19,
+    gameId: "bubble-woods",
+    playTime: 1206,
+    wins: 9,
+  },
+  "bubble-woods-mission-lvl": {
+    fails: 1,
+    gameId: "bubble-woods",
+    playTime: 100,
+    wins: 2,
+  },
+  "candy-bubble-mission-lvl": {
+    fails: 6,
+    gameId: "candy-bubble",
+    playTime: 1558,
+    wins: 6,
+  },
+};
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
+type Result = {
+  fails: number;
+  gameId: string;
+  playTime: number;
+  wins: number;
+};
 
-function Section({children, title}: SectionProps): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+const getGrouped = () => {
+  return Object.entries(data).reduce<Result[]>((acc, cur) => {
+    const [, value] = cur;
+    if (acc.some(i => i.gameId === value.gameId)) {
+      const a = acc.find(i => i.gameId === value.gameId);
+      a!.fails += value.fails;
+      a!.playTime += value.playTime;
+      a!.wins += value.wins;
+    } else {
+      acc.push(value);
+    }
+    return acc;
+  }, []);
+};
+
+const App = () => {
+  const app = createApp();
+
+  /**
+   * completed test snippet from developers test
+   */
+  console.log(getGrouped());
+
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <AppProvider app={app}>
+      <StatusBar barStyle="light-content" />
+      <RootNavigator />
+    </AppProvider>
   );
-}
-
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+};
 
 export default App;
